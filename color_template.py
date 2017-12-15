@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 import argparse
 import csv
+import sys
 
 ec_re = re.compile(r'([\d-]+\.[\d-]+\.[\d-]+\.[\d-]+)')
 pfam_re = re.compile(r'PF\d+(\.\d+)?')
@@ -123,8 +124,11 @@ if __name__ == '__main__':
 
     root[0].text += css_text
 
+    organism_position_writer = csv.writer(sys.stdout)
+    organism_position_writer.writerow(['row', 'column', 'organism'])
     for o, (row, column, color) in organism_positions.items():
-        print('{} {} {}'.format(row + 1, column + 1, o))
+        organism_position_writer.writerow([row + 1, column + 1, o])
+        #print('{} {} {}'.format(row + 1, column + 1, o))
 
     for group in root.iter():
         name = group.get('id')
