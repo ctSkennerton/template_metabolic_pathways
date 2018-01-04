@@ -6,7 +6,10 @@ import csv
 import sys
 
 ec_re = re.compile(r'([\d-]+\.[\d-]+\.[\d-]+\.[\d-]+)')
-pfam_re = re.compile(r'PF\d+(\.\d+)?')
+pfam_re = re.compile(r'(PF\d+)(\.\d+)?')
+ko_re = re.compile(r'(K\d{5})')
+
+
 def process_box_name(name):
     ec_part = name[4:]  # remove box- from the start
 
@@ -18,15 +21,15 @@ def process_box_name(name):
         ecs = [ec_part]
 
     for i in range(len(ecs)):
-        match = ec_re.search(ecs[i])
-        if match:
-            ecs[i] = match.group(1)
-        else:
-            match = pfam_re.search(ecs[i])
+        for r in [ec_re, pfam_re, ko_re]:
+            match = r.search(ecs[i])
             if match:
-                ecs[i] = match.group(0)
-            else:
-                raise ValueError("could not extract EC or Pfam from {}".format(ec_part))
+                ecs[i] = match.group(1)
+                break
+
+        # if none of the re are true then it will remain false
+        if not match:
+            raise ValueError("could not extract EC or Pfam from {}".format(ec_part))
 
     return ecs
 
